@@ -1,30 +1,4 @@
-real-time-orders/
-├─ app/
-│  ├─ __init__.py
-│  ├─ ui_app.py                 # Streamlit UI
-│  ├─ db.py                     # SQLite + migrations
-│  ├─ pipeline.py               # ingest + forecast
-│  ├─ io_utils.py               # file handling
-│  ├─ validate.py               # input validation/auto-detect
-│  ├─ model_train.py            # Smart Forecasting (per-item models)
-│  ├─ auth.py                   # users, login, OTP reset
-│  ├─ services/
-│  │  ├─ weather_service.py     # Meteostat history + forecast
-│  │  └─ holiday_service.py     # Public holidays
-│  └─ tools/
-│     └─ reset_admin.py         # create/reset an admin user (CLI)
-├─ data/                        # (ignored) uploads, samples
-│  └─ README.md
-├─ outputs/                     # (ignored) exports & backups
-├─ .streamlit/
-│  └─ config.toml               # theme (optional)
-├─ app.sqlite                   # (ignored) local database
-├─ README.md                    # 👈 your main documentation
-├─ requirements.txt             # or use pyproject.toml
-├─ .gitignore
-└─ LICENSE                      # (MIT suggested)
 
------------------------------------------------
 password NewStrongPassword! usnername sandra
 ================
 # Python
