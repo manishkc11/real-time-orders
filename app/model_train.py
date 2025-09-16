@@ -1,18 +1,19 @@
 # app/model_train.py
-from __future__ import annotations
-import json
-import pickle
+import json, pickle
 from dataclasses import dataclass
 from datetime import date, datetime, timedelta
 from typing import Dict, List, Tuple, Optional
 
 import numpy as np
 import pandas as pd
+from sklearn.impute import SimpleImputer
 from sklearn.linear_model import Ridge
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 
 from app.db import get_conn
+
+
 
 # ----------------------- Utilities -----------------------
 
@@ -145,6 +146,7 @@ def _time_series_cv_mape(X: pd.DataFrame, y: pd.Series, splits: int = 3) -> floa
         if k < 10 or k >= n:
             continue
         model = Pipeline([
+            ("imputer", SimpleImputer(strategy="median")),
             ("scaler", StandardScaler()),
             ("ridge", Ridge(alpha=1.0))
         ])
@@ -186,6 +188,7 @@ def train_model_for_item(conn, item_id: int) -> TrainResult:
         return TrainResult(item_id, len(y), None, False)
 
     pipe = Pipeline([
+        ("imputer", SimpleImputer(strategy="median")),
         ("scaler", StandardScaler()),
         ("ridge", Ridge(alpha=1.0))
     ])
@@ -245,15 +248,6 @@ def train_models_for_all_items(min_samples: int = 30) -> List[TrainResult]:
 
 # --------- Optional: predict next week using a saved model (per item) ---------
 
-def _load_model_for_item(conn, item_id: int):
-    r = conn.execute("SELECT model_blob, features_json FROM models WHERE item_id=?", (item_id,)).fetchone()
-    if not r:
-        return None
-    blob, feat_json = r
-    obj = pickle.loads(blob)
-    feats = json.loads(feat_json) if feat_json else {}
-    return obj, feats
-
 def predict_next_week_for_item(conn, item_id: int, week_start: date) -> Optional[np.ndarray]:
     """
     Return 6 predicted values (Mon..Sat) for one item if a model exists.
@@ -271,20 +265,30 @@ def predict_next_week_for_item(conn, item_id: int, week_start: date) -> Optional
     df_future["weekday"] = df_future["date"].dt.weekday
 
     # join forecast weather
-    w = pd.read_sql_query("""
+    w = pd.read_sql_query(
+        """
         SELECT date, max_temp, rain_mm FROM weather
         WHERE date BETWEEN ? AND ?
-    """, conn, params=(week_start.isoformat(), (week_start + timedelta(days=5)).isoformat()))
-    w["date"] = pd.to_datetime(w["date"])
+        """,
+        conn,
+        params=(week_start.isoformat(), (week_start + timedelta(days=5)).isoformat()),
+    )
+    if not w.empty:
+        w["date"] = pd.to_datetime(w["date"])
     df_future = df_future.merge(w, on="date", how="left")
 
     # holiday flag
-    h = pd.read_sql_query("""
+    h = pd.read_sql_query(
+        """
         SELECT date, 1 AS is_holiday FROM events
         WHERE (event_type='public_holiday' OR COALESCE(uplift_pct,0)>0)
           AND date BETWEEN ? AND ?
-    """, conn, params=(week_start.isoformat(), (week_start + timedelta(days=5)).isoformat()))
-    h["date"] = pd.to_datetime(h["date"])
+        """,
+        conn,
+        params=(week_start.isoformat(), (week_start + timedelta(days=5)).isoformat()),
+    )
+    if not h.empty:
+        h["date"] = pd.to_datetime(h["date"])
     df_future = df_future.merge(h, on="date", how="left").fillna({"is_holiday": 0})
 
     # calendar feats
@@ -296,7 +300,16 @@ def predict_next_week_for_item(conn, item_id: int, week_start: date) -> Optional
             df_future[c] = 0.0
     X = df_future[feat_names].astype(float)
 
+    # --- Safety guard for NaNs and old models ---
+    X = X.apply(pd.to_numeric, errors="coerce")
+    steps = getattr(model, "named_steps", {})
+    if "imputer" not in steps:
+        # Old models (without imputer) → fill NaNs manually
+        X = X.fillna(X.median(numeric_only=True))
+    # --------------------------------------------
+
     yhat = model.predict(X)
-    # non-negative + round
     yhat = np.maximum(0, np.round(yhat)).astype(int)
     return yhat
+
+
