@@ -1,4 +1,4 @@
-1) Prerequisites
+Prerequisites
 
 Python 3.11 or newer
 
