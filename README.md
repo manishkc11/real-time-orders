@@ -1,160 +1,220 @@
+1) Prerequisites
 
-password NewStrongPassword! usnername sandra
-================
-# Python
-__pycache__/
-*.py[cod]
-*.egg-info/
+Python 3.11 or newer
 
-# venv / tooling
-.venv/
-.env
-.env.*
+Windows: download from https://www.python.org/downloads/
+ (check “Add Python to PATH” during install).
 
-# Streamlit
-.streamlit/secrets.toml
+macOS: brew install python@3.11 (or use the official pkg).
 
-# Project data
-app.sqlite
-outputs/
-data/
-!data/README.md
+Linux: use your package manager or python.org.
 
-# OS/editor cruft
-.DS_Store
-Thumbs.db
-.vscode/
----------------------------------------------------------
-requirements.txt (if you’re not using pyproject.toml)
-streamlit>=1.36
-pandas>=2.2
-numpy>=1.26
-scikit-learn>=1.4
-meteostat>=1.6
-holidays>=0.52
-python-dateutil>=2.9
--------------------------
-# Real-Time Order Updating System
+Git (optional but recommended): https://git-scm.com/downloads
 
-A Streamlit app that predicts next week’s baking quantities by learning from past sales, while adjusting for **weather** and **public holidays**. Designed for non-technical bakery staff with a simple “Upload → Preview → Download” workflow.
+Alternatively, you can download the repo as a ZIP and extract it.
 
----
+SQLite is already built into Python — no separate install needed.
 
-## ✨ Features
+2) Get the project
+Option A — clone (recommended)
+# Pick a folder where you want the project to live
+git clone https://github.com/<your-org-or-user>/<repo-name>.git
+cd <repo-name>
 
-- **Upload** weekly sales (CSV/XLSX) — auto-detects/normalizes Square exports
-- **Smart Forecasting**: blends a weekday baseline with per-item ML models
-- **Weather & Holidays**: auto-fetch history/forecast; adjust recs
-- **Download** a clean order sheet (XLSX)
-- **History** of past forecasts
-- **Admin**:
-  - create users
-  - one-time code password reset (OTP)
-  - retrain models (“Improve accuracy”)
+Option B — download ZIP
 
----
+Click “Code → Download ZIP” on GitHub, unzip, then cd into the project folder.
 
-## 🔧 Quick start
+3) Create a virtual environment & install packages
 
-### 1) Clone & install
+Run all commands from the project folder (where pyproject.toml and requirements.txt live).
 
-```bash
-git clone <your-repo-url>
-cd real-time-orders
-
-# Option A: requirements.txt
+Windows (PowerShell)
 python -m venv .venv
-# Windows:
-.venv\Scripts\Activate.ps1
-# macOS/Linux:
+.\.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+
+macOS/Linux (bash/zsh)
+python3 -m venv .venv
 source .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
 
-pip install -r requirements.txt
 
-# Option B: if you use pyproject.toml (poetry/hatch/pip-tools), follow your team’s standard.
-Run the app
-streamlit run app/ui_app.py
-The app creates/updates app.sqlite automatically. 🧭 How to use
+If you see “No module named X” later, re-activate the venv and run python -m pip install <package> or re-install -r requirements.txt.
+
+4) Initialize the database & user tables (one-time)
+
+These commands ensure the DB file exists and that the password reset columns are present.
+
+# Always run from the project root
+# Use the venv you created above
+
+# Make sure the migrations module runs in "package" mode:
+python -m app.migrations_add_otp
+
+
+This prints:
+
+OK: users table has password_salt, reset_code, reset_expires
+
+
+The app uses app.sqlite in the project root. Back it up like any file if you want to move users/history between machines.
+
+5) Create the first admin (one-time)
+Option A — simple interactive script
+python create_admin.py
+# it will prompt:
+# Username: (press Enter for "admin" or type another)
+# Password: *******
+# Confirm password: *******
+# prints: Admin created: id=<n>, username=<name>
+
+Option B — force/reset an admin from the command line
+
+(Useful if you need to reset a broken password)
+
+# Replace values as you like
+python -m app.tools.reset_admin --username admin --password "NewStrongPassword!"
+
+
+If you see “no such column: is_active” it’s safe — we no longer require that column. The tool will still update password & role.
+
+6) Start the app
+Windows (PowerShell)
+# From the project root with venv active
+python -m streamlit run app/ui_app.py
+
+macOS/Linux (bash/zsh)
+python -m streamlit run app/ui_app.py
+
+
+It will print a local URL (usually http://localhost:8501
+). Open it in your browser.
+
+7) Daily usage (for the client)
+
+Sign in with the admin account you created.
+
+If a user forgets the password:
+Admin → “Forgot password (one-time code)” → generate a code → share it with the user → the user uses the “Forgot password?” expander on the login screen to reset.
 
 Upload
-Drop your sales file (CSV/XLSX). The app will:
 
-auto-map headers (date, item_name, quantity_sold)
+Go to Upload, drop the weekly Excel/CSV.
 
-detect/refund rows (flip sign)
+The app auto-normalizes columns (maps Square field names), handles refunds, aggregates duplicates, and ingests into the DB.
 
-aggregate duplicates
-
-ingest into the database
-
-After upload, the app also fetches the required weather history and holidays that match your data range.
+After ingest, the system quietly trains per-item models where there’s enough data.
 
 Configure (optional)
 
-Upload events (e.g., promos) with % uplift
+If you want, upload manual weather or events.
 
-Upload manual weather for next week (optional override)
-
-Buttons to refresh next 7-day weather and upcoming holidays
+The Admin page also has buttons to refresh upcoming holidays and backup the DB.
 
 Preview
 
-Toggle Smart Forecasting (improves accuracy)
+Generate next week’s recommendations.
 
-Adjust AI emphasis slider (how much to trust ML vs. historical baseline)
+Optionally toggle Smart Forecasting (blended with the baseline).
 
-Click Generate forecast to see Mon–Sat baking recs
-
-Download
-
-Export the current forecast as Excel
-
-(Optional) email sharing (if you add that integration later)
+Download the output from Download tab.
 
 History
 
-Browse saved forecasts by week & timestamp
+View previously generated forecast snapshots grouped by run time; select one to view.
 
-Admin
+8) What’s in requirements.txt
 
-Create user
+If you need to regenerate or check it, here’s a safe set that matches the code you’ve been running:
 
-Forgot password (generate one-time reset code; user redeems it on login screen)
+streamlit>=1.36
+pandas>=2.2
+numpy>=1.26
+openpyxl>=3.1
+XlsxWriter>=3.2
+python-dateutil>=2.9
+pytz>=2024.1
+meteostat>=1.6
+requests>=2.32
+holidays>=0.53
+scikit-learn>=1.5
+statsmodels>=0.14
 
-Improve accuracy (retrain models now)
 
-🗂️ Data model (SQLite)
+If you’re completely offline at the client site, you’ll need to pre-download these wheels and install them from a USB stick; otherwise pip will fetch them automatically.
 
-users(id, username, role, password_hash, password_salt, reset_code, reset_expires)
+9) Where passwords & users live
 
-sales_data(date, item_name, quantity_sold, item_id, …)
+Users & passwords are stored in app.sqlite, table users.
 
-items(id, canonical_name, …)
+Passwords use PBKDF2-HMAC-SHA256 with a per-user salt.
 
-weather(date, max_temp, rain_mm, source)
+If your colleague can’t log in on their laptop, either:
 
-events(date, event_name, event_type, uplift_pct)
+They’re using a different app.sqlite that doesn’t have that user
+→ copy your app.sqlite to their machine; or
 
-holidays(date, name, country, subdiv)
+They’re using the right DB but forgot the password
+→ on their laptop, run the admin reset:
 
-models(item_id, algo, model_blob, features_json, n_samples, cv_mape, updated_at)
+# With that laptop's venv active and inside the project
+python -m app.tools.reset_admin --username admin --password "ResetMe!123"
 
-forecasts(week_start_date, item_name, mon, tue, wed, thu, fri, sat, alerts, reasoning, created_at)
+10) Common problems & instant fixes
 
-Tables are created/migrated automatically by app/db.py when the app or tools touch the DB.
+streamlit: command not found
+Use the venv and module form:
+python -m streamlit run app/ui_app.py
 
-🔐 Security & privacy
+No module named 'app' or imports fail
+You’re likely not in the project root. cd into the folder that contains the app/ directory and run commands as python -m app.xxx.
 
-Do not commit app.sqlite, data/, or outputs/ (already ignored).
+ModuleNotFoundError: No module named meteostat (or others)
+Activate the venv and run: python -m pip install -r requirements.txt
 
-Passwords are hashed with PBKDF2-HMAC-SHA256 and unique per-user salts.
-
-One-time codes are short-lived (15 min). In production you’d email/SMS them.
-
-🧪 Local tips
-
-If you need to reset an admin again:
+binascii.Error: Non-hexadecimal digit found when logging in
+Your DB has an old/invalid salt. Reset the admin password:
 python -m app.tools.reset_admin --username admin --password "NewStrongPassword!"
 
-If Meteostat blocks anonymous traffic at your IP, add a cache or run once on a different network. (The app tolerates brief outages.)
---------------------------------------------------------------
+NOT NULL constraint failed: users.created_at
+We fixed the code to tolerate DBs without created_at/updated_at. If you still see this, either run a quick migration to add the columns, or recreate the DB:
+
+# add nullable timestamps if you want them
+python - <<'PY'
+
+
+from app.db import get_conn
+with get_conn() as c:
+try: c.execute("ALTER TABLE users ADD COLUMN created_at TEXT")
+except: pass
+try: c.execute("ALTER TABLE users ADD COLUMN updated_at TEXT")
+except: pass
+c.commit()
+print("Done.")
+PY
+
+
+---
+
+# 11) Backups & moving to another laptop
+
+- The entire database is the `app.sqlite` file in the project root.  
+- Back it up from **Admin → Create & download DB backup**, or copy the file manually when the app isn’t running.
+- Restore by replacing the `app.sqlite` file in the new machine’s project folder.
+
+---
+
+# 12) Updating the app
+
+When you push changes to GitHub:
+
+```bash
+# on the client machine
+cd <repo-name>
+git pull
+# ensure venv is active
+python -m pip install -r requirements.txt
+python -m streamlit run app/ui_app.py
