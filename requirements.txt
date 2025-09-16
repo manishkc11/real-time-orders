@@ -1,0 +1,38 @@
+﻿streamlit>=1.36
+pandas>=2.2
+numpy>=1.26
+meteostat>=1.6
+holidays>=0.52
+openpyxl>=3.1
+xlrd>=2.0
+scikit-learn>=1.4
+tzdata>=2024.1
+### Quick start
+
+#```powershell
+#python -m venv .venv
+#.\.venv\Scripts\Activate.ps1
+#pip install -U pip wheel
+#pip install -r requirements.txt
+
+# run the app
+#streamlit run app/ui_app.py
+#remove the teh comment te use 
+# --- core app runtime ---
+streamlit>=1.36
+pandas>=2.2
+numpy>=1.26
+
+# weather + holidays
+meteostat>=1.6
+holidays>=0.52
+
+# Excel/CSV readers (pandas will use these)
+openpyxl>=3.1      # .xlsx
+xlrd>=2.0          # legacy .xls (if you ever need it)
+
+# ML (your per-item models and backtesting)
+scikit-learn>=1.4
+
+# nice-to-haves / stability on Windows
+tzdata>=2024.1     # timezone data on Windows
