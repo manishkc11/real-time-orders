@@ -61,17 +61,10 @@ real-time-orders-main/
 Clone the repo:
 
 ```bash
-git clone https://github.com/<your-org>/<your-repo>.git
+git clone https://github.com/manishkc11/real-time-orders.git
 cd real-time-orders-main
 ```
 
-Create and activate a virtual environment:
-
-```bash
-python -m venv venv
-source venv/bin/activate      # macOS/Linux
-venv\Scripts\activate         # Windows
-```
 
 Install dependencies:
 
@@ -133,15 +126,15 @@ pip install -e .
 
 ## 📜 License
 
-This project was developed as part of an academic capstone.  
+This project was developed as part of an academic capstone of Wentworth Institute of Higher Education, Surry Hills.  
 For commercial use, please contact the authors.
 
 ---
 
 ## 👥 Contributors
 
-- Enosh Basnet (Team Lead)
+- Enosh Basnet 
 - Rabin Pokhrel
 - Rabin Shiwakoti
-- Manish Chaudhary
+- Manish Chaudhary(Team Lead)
 - Ashok
