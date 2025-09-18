@@ -1,0 +1,13 @@
+[project]
+name = "real-time-orders"
+version = "0.1.0"
+description = "Real-Time Order Updating System (Excel Upload + SQLite + Streamlit)"
+requires-python = ">=3.10"
+dependencies = [
+  "pandas>=2.2",
+  "numpy>=1.26",
+  "openpyxl>=3.1",
+  "streamlit>=1.36",
+  "scikit-learn>=1.4",
+  "pydantic>=2.7"
+]
