@@ -1,4 +1,4 @@
-# Real-Time Order Updating System 🍞📊
+# Hudson Bakery: Forecasting Pipeline🍞📊
 
 A **Streamlit application** for bakeries to predict next week’s baking quantities in real time.  
 Built for Hudson’s Bakery (Bondi Junction) as part of a capstone project.
