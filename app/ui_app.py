@@ -35,7 +35,7 @@ from app.validate import (
     validate_sales,
 )
 
-st.set_page_config(page_title="Real-Time Orders", layout="wide")
+st.set_page_config(page_title="Hudson Bakery: Forecasting Pipeline", layout="wide")
 
 LOADER_CSS = """
 <style>
@@ -70,30 +70,7 @@ LOADER_CSS = """
 @keyframes rt-spin {
     to { transform: rotate(360deg); }
 }
-.rt-dots-loader {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    max-width: 120px;
-    margin: 0.5rem 0;
-}
-.rt-dots-loader span {
-    display: block;
-    width: 8px;
-    height: 8px;
-    margin: 0 2px;
-    background: #1f6feb;
-    border-radius: 50%;
-    opacity: 0.7;
-    animation: rt-bounce 1s infinite;
-}
-.rt-dots-loader span:nth-child(2) { animation-delay: 0.2s; }
-.rt-dots-loader span:nth-child(3) { animation-delay: 0.4s; }
-@keyframes rt-bounce {
-    0%, 80%, 100% { transform: translateY(0); }
-    40% { transform: translateY(-10px); }
-}
+
 </style>
 """
 
@@ -153,7 +130,7 @@ def _train_models_after_upload() -> None:
 def login_ui() -> None:
     from app.auth import authenticate_user
 
-    st.title("Real-Time Order Updating System")
+    st.title("Hudson Bakery: Forecasting Pipeline")
     st.subheader("Sign in")
 
     with st.form("login-form"):
@@ -754,7 +731,7 @@ def main() -> None:
         return
 
     tab = _sidebar_header(auth)
-    st.title("Real-Time Order Updating System")
+    st.title("Hudson Bakery: Forecasting Pipeline")
 
     if tab == "Upload":
         _render_upload_tab(loader_placeholder)
@@ -774,3 +751,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
