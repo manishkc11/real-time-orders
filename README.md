@@ -77,7 +77,7 @@ pip install -e .
 ---
 
 ```bash
-3) Initialize the database (one-time)
+ Initialize the database (one-time)
 python -m app.migrations_add_otp
 ```
 
