@@ -136,6 +136,6 @@ For commercial use, please contact the authors.
 - Enosh Basnet 
 - Rabin Pokhrel
 - Rabin Shiwakoti
-- Manish Chaudhary(Team Lead)
-- Ashok
-- Utsabh Thapaliya
+- Manish Chaudhary
+- Ashok Pandey
+- Uttsab Thapaliya(Team Lead)
