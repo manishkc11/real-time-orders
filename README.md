@@ -85,7 +85,8 @@ pip install -e .
 
 2. **Run the app**:
    ```bash
-   streamlit run app/ui_app.py
+    .\.venv\Scripts\Activate.ps1
+   streamlit run app/ui_app.py 
    ```
 
 3. **Login** with your admin account.
