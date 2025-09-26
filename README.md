@@ -1,4 +1,4 @@
-# Hudson Bakery: Forecasting Pipeline🍞📊
+# Hudson Bakery: Forecasting Pipeline 🍞📊
 
 A **Streamlit application** for bakeries to predict next week’s baking quantities in real time.  
 Built for Hudson’s Bakery (Bondi Junction) as part of a capstone project.
@@ -61,10 +61,17 @@ real-time-orders-main/
 Clone the repo:
 
 ```bash
-git clone https://github.com/manishkc11/real-time-orders.git
+git clone https://github.com/<your-org>/<your-repo>.git
 cd real-time-orders-main
 ```
 
+Create and activate a virtual environment:
+
+```bash
+python -m venv venv
+source venv/bin/activate      # macOS/Linux
+venv\Scripts\activate         # Windows
+```
 
 Install dependencies:
 
@@ -75,24 +82,19 @@ pip install -e .
 ```
 
 ---
-Initialize the database (one-time)
-```bash
- 
-python -m app.migrations_add_otp
-```
-
 
 ## ▶️ Usage
 
 1. **Create the first admin user** (only once):
+
    ```bash
    python create_admin.py
    ```
 
 2. **Run the app**:
+
    ```bash
-    .\.venv\Scripts\Activate.ps1
-   streamlit run app/ui_app.py 
+   streamlit run app/ui_app.py
    ```
 
 3. **Login** with your admin account.
@@ -116,7 +118,7 @@ python -m app.migrations_add_otp
 - Models are stored in the SQLite DB.
 - Retrain via:
   - Admin → “Improve accuracy”
-  - or CLI:  
+  - or CLI:
     ```bash
     python train_models.py
     ```
@@ -133,16 +135,16 @@ python -m app.migrations_add_otp
 
 ## 📜 License
 
-This project was developed as part of an academic capstone of Wentworth Institute of Higher Education, Surry Hills.  
+This project was developed as part of an academic capstone.  
 For commercial use, please contact the authors.
 
 ---
 
 ## 👥 Contributors
 
-- Enosh Basnet 
+- Enosh Basnet (Team Lead)
 - Rabin Pokhrel
 - Rabin Shiwakoti
 - Manish Chaudhary
-- Ashok Pandey
-- Uttsab Thapaliya(Team Lead)
+- Ashok
+- Utsabh Thapaliya
