@@ -141,8 +141,6 @@ For commercial use, please contact the authors.
 ## 👥 Contributors
 
 - Enosh Basnet 
-- Rabin Pokhrel
 - Rabin Shiwakoti
 - Manish Chaudhary
 - Ashok Pandey
-- Uttsab Thapaliya(Team Lead)
